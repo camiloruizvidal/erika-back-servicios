@@ -17,4 +17,14 @@ export class Constantes {
   static readonly TOKEN_INVALIDO = 'El token proporcionado no es válido';
   static readonly TOKEN_SIN_CLAIMS =
     'El token no contiene la información requerida';
+  static readonly PAQUETE_YA_EXISTE =
+    'El tenant ya cuenta con un paquete con ese nombre';
+  static readonly SERVICIOS_REQUERIDOS =
+    'Debe registrar al menos un servicio para crear el paquete';
+  static readonly SERVICIO_DUPLICADO_EN_SOLICITUD =
+    'Existen servicios duplicados en la solicitud';
+  static readonly FECHA_FIN_ANTERIOR =
+    'La fecha de fin no puede ser anterior a la fecha de inicio';
+  static readonly TRANSACCION_NO_DISPONIBLE =
+    'No fue posible iniciar la transacción de base de datos';
 }

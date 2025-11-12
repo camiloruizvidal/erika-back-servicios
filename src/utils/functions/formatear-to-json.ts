@@ -5,7 +5,7 @@ export class FormatearToJson {
       return valor;
     }
     if (Array.isArray(valor)) {
-      return valor.map(registro => registro.toJSON());
+      return valor.map((registro) => registro.toJSON());
     } else if (typeof valor === 'object' && valor !== null) {
       return valor.toJSON();
     }
