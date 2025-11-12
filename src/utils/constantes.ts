@@ -27,4 +27,12 @@ export class Constantes {
     'La fecha de fin no puede ser anterior a la fecha de inicio';
   static readonly TRANSACCION_NO_DISPONIBLE =
     'No fue posible iniciar la transacción de base de datos';
+  static readonly SERVICIO_YA_EXISTE =
+    'El tenant ya cuenta con un servicio con ese nombre';
+  static readonly PAQUETE_NO_ENCONTRADO =
+    'El paquete indicado no existe para este tenant';
+  static readonly LONGITUD_MINIMA = (campo: string, minimo: number) =>
+    `${campo} debe tener al menos ${minimo} caracteres`;
+  static readonly VALOR_MINIMO = (campo: string, minimo: number) =>
+    `${campo} debe ser mayor o igual a ${minimo}`;
 }

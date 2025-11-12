@@ -45,4 +45,10 @@ export class ServicioRepository {
       returning: true,
     });
   }
+
+  static async crearServicio(
+    registro: { tenantId: number; nombre: string; valor: number },
+  ): Promise<ServicioModel> {
+    return ServicioModel.create(registro);
+  }
 }
