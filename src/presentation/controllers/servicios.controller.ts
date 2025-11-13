@@ -1,14 +1,21 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Logger,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { CrearServicioRequestDto } from '../dto/crear-servicio.request.dto';
@@ -17,6 +24,12 @@ import { ServiciosService } from '../../application/services/servicios.service';
 import { ManejadorError } from '../../utils/manejador-error/manejador-error';
 import { ServiciosMapper } from '../../shared/mappings/servicios.mapper';
 import { JwtTenantGuard } from '../guards/jwt-tenant.guard';
+import { PaginadoRequestDto } from '../dto/paginado.request.dto';
+import {
+  ServiciosSinPaquetePaginadosResponseDto,
+  ServiciosConPaquetesPaginadosResponseDto,
+} from '../dto/paginado.response.dto';
+
 interface RequestConTenant extends Request {
   tenantId: number;
 }
@@ -28,6 +41,70 @@ export class ServiciosController {
     private readonly serviciosService: ServiciosService,
     private readonly manejadorError: ManejadorError,
   ) {}
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtTenantGuard)
+  @ApiOkResponse({ type: ServiciosSinPaquetePaginadosResponseDto })
+  public async listarSinPaquetes(
+    @Query() query: PaginadoRequestDto,
+    @Req() request: RequestConTenant,
+  ): Promise<ServiciosSinPaquetePaginadosResponseDto> {
+    try {
+      const tenantId = request.tenantId;
+      const pagina = query.pagina ?? 1;
+      const tamanoPagina = query.tamanoPagina ?? 10;
+
+      const resultado = await this.serviciosService.listarServiciosSinPaquete(
+        tenantId,
+        pagina,
+        tamanoPagina,
+      );
+
+      return plainToInstance(
+        ServiciosSinPaquetePaginadosResponseDto,
+        resultado,
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+    } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
+      this.manejadorError.resolverErrorApi(error);
+    }
+  }
+
+  @Get('packages')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtTenantGuard)
+  @ApiOkResponse({ type: ServiciosConPaquetesPaginadosResponseDto })
+  public async listarConPaquetes(
+    @Query() query: PaginadoRequestDto,
+    @Req() request: RequestConTenant,
+  ): Promise<ServiciosConPaquetesPaginadosResponseDto> {
+    try {
+      const tenantId = request.tenantId;
+      const pagina = query.pagina ?? 1;
+      const tamanoPagina = query.tamanoPagina ?? 10;
+
+      const resultado = await this.serviciosService.listarServiciosDePaquetes(
+        tenantId,
+        pagina,
+        tamanoPagina,
+      );
+
+      return plainToInstance(
+        ServiciosConPaquetesPaginadosResponseDto,
+        resultado,
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+    } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
+      this.manejadorError.resolverErrorApi(error);
+    }
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

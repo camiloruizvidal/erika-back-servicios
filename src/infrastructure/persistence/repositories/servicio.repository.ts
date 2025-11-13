@@ -2,6 +2,8 @@ import { Op } from 'sequelize';
 import { ServicioModel } from '../models/servicio.model';
 import { Transformador } from 'src/utils/transformador.util';
 import { IServicio } from '../interfaces/servicio.interface';
+import { PaqueteModel } from '../models/paquete.model';
+import { IResultadoFindAndCount } from '../../../shared/interfaces/sequelize-find.interface';
 
 export class ServicioRepository {
   static async buscarPorNombre(
@@ -14,7 +16,7 @@ export class ServicioRepository {
         tenantId,
       },
     });
-    return Transformador.extraerDataValues(servicio);
+    return Transformador.extraerDataValues(servicio) as IServicio;
   }
 
   static async buscarPorNombres(
@@ -33,7 +35,7 @@ export class ServicioRepository {
         },
       },
     });
-    return Transformador.extraerDataValues(servicios);
+    return Transformador.extraerDataValues(servicios) as IServicio[];
   }
 
   static async crearServicios(
@@ -46,7 +48,7 @@ export class ServicioRepository {
     const servicios = await ServicioModel.bulkCreate(registros, {
       returning: true,
     });
-    return Transformador.extraerDataValues(servicios);
+    return Transformador.extraerDataValues(servicios) as IServicio[];
   }
 
   static async crearServicio(registro: {
@@ -55,7 +57,7 @@ export class ServicioRepository {
     valor: number;
   }): Promise<IServicio> {
     const servicio = await ServicioModel.create(registro);
-    return Transformador.extraerDataValues(servicio);
+    return Transformador.extraerDataValues(servicio) as IServicio;
   }
 
   static async buscarPorIds(
@@ -74,6 +76,61 @@ export class ServicioRepository {
         },
       },
     });
-    return Transformador.extraerDataValues(servicios);
+    return Transformador.extraerDataValues(servicios) as IServicio[];
+  }
+
+  static async listarSinPaquete(
+    tenantId: number,
+    offset: number,
+    limit: number,
+  ): Promise<IResultadoFindAndCount<IServicio>> {
+    const resultado = await ServicioModel.findAndCountAll({
+      where: {
+        tenantId,
+        '$paquetes.id$': null,
+      },
+      include: [
+        {
+          model: PaqueteModel,
+          attributes: [],
+          through: { attributes: [] },
+          required: false,
+        },
+      ],
+      distinct: true,
+      offset,
+      limit,
+      order: [['created_at', 'DESC']],
+    });
+    return Transformador.extraerDataValues(
+      resultado,
+    ) as IResultadoFindAndCount<IServicio>;
+  }
+
+  static async listarConPaquetes(
+    tenantId: number,
+    offset: number,
+    limit: number,
+  ): Promise<IResultadoFindAndCount<IServicio>> {
+    const resultado = await ServicioModel.findAndCountAll({
+      where: {
+        tenantId,
+      },
+      include: [
+        {
+          model: PaqueteModel,
+          attributes: ['id', 'nombre'],
+          through: { attributes: [] },
+          required: true,
+        },
+      ],
+      distinct: true,
+      offset,
+      limit,
+      order: [['created_at', 'DESC']],
+    });
+    return Transformador.extraerDataValues(
+      resultado,
+    ) as IResultadoFindAndCount<IServicio>;
   }
 }

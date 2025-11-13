@@ -3,5 +3,8 @@ export interface IServicio {
   tenantId: number;
   nombre: string;
   valor: number;
+  paquetes?: Array<{
+    id: number;
+    nombre: string;
+  }>;
 }
-

@@ -9,7 +9,11 @@ import { PaqueteRepository } from '../../infrastructure/persistence/repositories
 import { PaqueteServicioRepository } from '../../infrastructure/persistence/repositories/paquete-servicio.repository';
 import { ErrorPersonalizado } from '../../utils/error-personalizado/error-personalizado';
 import { Constantes } from '../../utils/constantes';
-import { IServicio } from '../../infrastructure/persistence/interfaces/servicio.interface';
+import { IPaginado } from '../../shared/interfaces/paginado.interface';
+import {
+  IServicioSinPaqueteListado,
+  IServicioConPaquetesListado,
+} from '../../domain/interfaces/listados-servicios.interface';
 
 @Injectable()
 export class ServiciosService implements IServiciosService {
@@ -71,5 +75,51 @@ export class ServiciosService implements IServiciosService {
     }
 
     return servicioResultado;
+  }
+
+  public async listarServiciosSinPaquete(
+    tenantId: number,
+    pagina: number,
+    tamanoPagina: number,
+  ): Promise<IPaginado<IServicioSinPaqueteListado>> {
+    const offset = (pagina - 1) * tamanoPagina;
+
+    const resultado = await ServicioRepository.listarSinPaquete(
+      tenantId,
+      offset,
+      tamanoPagina,
+    );
+
+    return {
+      meta: {
+        total: Number(resultado.count),
+        pagina,
+        tamanoPagina,
+      },
+      data: resultado.rows as IServicioSinPaqueteListado[],
+    };
+  }
+
+  public async listarServiciosDePaquetes(
+    tenantId: number,
+    pagina: number,
+    tamanoPagina: number,
+  ): Promise<IPaginado<IServicioConPaquetesListado>> {
+    const offset = (pagina - 1) * tamanoPagina;
+
+    const resultado = await ServicioRepository.listarConPaquetes(
+      tenantId,
+      offset,
+      tamanoPagina,
+    );
+
+    return {
+      meta: {
+        total: Number(resultado.count),
+        pagina,
+        tamanoPagina,
+      },
+      data: resultado.rows as IServicioConPaquetesListado[],
+    };
   }
 }
