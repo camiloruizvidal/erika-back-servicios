@@ -57,7 +57,7 @@ export class PaquetesController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error(error);
+      Logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -84,6 +84,7 @@ export class PaquetesController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }

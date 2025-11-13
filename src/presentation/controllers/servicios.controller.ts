@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   Req,
   UseGuards,
@@ -45,6 +46,7 @@ export class ServiciosController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
