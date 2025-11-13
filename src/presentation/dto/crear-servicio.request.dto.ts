@@ -40,7 +40,7 @@ const transformarEntero = (valor: EntradaNumerica): number | undefined => {
   return Number.isNaN(entero) ? undefined : entero;
 };
 
-export class CrearServicioDto {
+export class CrearServicioRequestDto {
   @ApiProperty({
     description: 'Nombre del servicio a registrar',
     example: 'Soporte técnico premium',

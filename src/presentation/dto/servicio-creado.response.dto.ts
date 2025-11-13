@@ -1,7 +1,7 @@
 import { Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ServicioCreadoDto {
+export class ServicioCreadoResponseDto {
   @ApiProperty({
     description: 'Identificador generado para el servicio',
     type: Number,
@@ -9,7 +9,7 @@ export class ServicioCreadoDto {
   })
   @Transform(({ value }) => Number(value))
   @Expose()
-  id!: number;
+  id: number;
 
   @ApiProperty({
     description: 'Nombre del servicio registrado',
@@ -17,16 +17,15 @@ export class ServicioCreadoDto {
     example: 'Soporte técnico premium',
   })
   @Expose()
-  nombre!: string;
+  nombre: string;
 
   @ApiProperty({
     description: 'Valor del servicio en moneda local',
     type: Number,
     example: 95000,
   })
-  @Transform(({ value }) => Number(value))
-  @Expose()
-  valor!: number;
+  @Expose({ name: 'valor' })
+  valor: number;
 
   @ApiProperty({
     description:
@@ -35,10 +34,6 @@ export class ServicioCreadoDto {
     nullable: true,
     example: null,
   })
-  @Transform(({ value }) =>
-    value === null || value === undefined ? null : Number(value),
-  )
-  @Expose()
-  paqueteId!: number | null;
+  @Expose({ name: 'paqueteId' })
+  paquete_id: number;
 }
-

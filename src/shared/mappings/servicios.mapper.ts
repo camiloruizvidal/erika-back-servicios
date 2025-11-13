@@ -1,9 +1,9 @@
-import { CrearServicioDto } from '../../presentation/dto/crear-servicio.dto';
+import { CrearServicioRequestDto } from '../../presentation/dto/crear-servicio.request.dto';
 import { ICrearServicio } from '../../domain/interfaces/servicios.interface';
 
 export class ServiciosMapper {
   static toInterface(
-    dto: CrearServicioDto,
+    dto: CrearServicioRequestDto,
     tenantId: number,
   ): ICrearServicio {
     return {

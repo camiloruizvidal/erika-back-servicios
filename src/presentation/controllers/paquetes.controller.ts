@@ -4,24 +4,31 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Param,
+  ParseIntPipe,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
-import { CrearPaqueteDto } from '../dto/crear-paquete.dto';
+import { CrearPaqueteRequestDto } from '../dto/crear-paquete.request.dto';
 import { PaquetesService } from '../../application/services/paquetes.service';
 import { ManejadorError } from '../../utils/manejador-error/manejador-error';
 import { PaquetesMapper } from '../../shared/mappings/paquetes.mapper';
-import { PaqueteCreadoDto } from '../dto/paquete-creado.dto';
+import { PaqueteCreadoResponseDto } from '../dto/paquete-creado.response.dto';
 import { JwtTenantGuard } from '../guards/jwt-tenant.guard';
-import { ErrorPersonalizado } from '../../utils/error-personalizado/error-personalizado';
-import { Constantes } from '../../utils/constantes';
+import { ActualizarServiciosPaqueteRequestDto } from '../dto/actualizar-servicios-paquete.request.dto';
 
 interface RequestConTenant extends Request {
-  tenantId?: number;
+  tenantId: number;
 }
 
 @ApiTags('packages')
@@ -35,28 +42,48 @@ export class PaquetesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtTenantGuard)
-  @ApiBody({ type: CrearPaqueteDto })
-  @ApiCreatedResponse({ type: PaqueteCreadoDto })
+  @ApiBody({ type: CrearPaqueteRequestDto })
+  @ApiCreatedResponse({ type: PaqueteCreadoResponseDto })
   public async crear(
-    @Body() dto: CrearPaqueteDto,
+    @Body() dto: CrearPaqueteRequestDto,
     @Req() request: RequestConTenant,
-  ): Promise<PaqueteCreadoDto> {
+  ): Promise<PaqueteCreadoResponseDto> {
     try {
       const tenantId = request.tenantId;
-      if (tenantId === undefined) {
-        throw new ErrorPersonalizado(
-          HttpStatus.UNAUTHORIZED,
-          Constantes.TOKEN_SIN_CLAIMS,
-        );
-      }
       const payload = PaquetesMapper.toInterface(dto, tenantId);
       const respuesta = await this.paquetesService.crearPaquete(payload);
       console.log({ respuesta: JSON.stringify(respuesta) });
-      return plainToInstance(PaqueteCreadoDto, respuesta, {
+      return plainToInstance(PaqueteCreadoResponseDto, respuesta, {
         excludeExtraneousValues: true,
       });
     } catch (error) {
       Logger.error(error);
+      this.manejadorError.resolverErrorApi(error);
+    }
+  }
+
+  @Put(':paqueteId/services')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtTenantGuard)
+  @ApiBody({ type: ActualizarServiciosPaqueteRequestDto })
+  @ApiOkResponse({ type: PaqueteCreadoResponseDto })
+  public async actualizarServicios(
+    @Param('paqueteId', ParseIntPipe) paqueteId: number,
+    @Body() dto: ActualizarServiciosPaqueteRequestDto,
+    @Req() request: RequestConTenant,
+  ): Promise<PaqueteCreadoResponseDto> {
+    try {
+      const tenantId = request.tenantId;
+      const resultado = await this.paquetesService.actualizarServiciosPaquete(
+        tenantId,
+        paqueteId,
+        dto.servicioIds,
+      );
+
+      return plainToInstance(PaqueteCreadoResponseDto, resultado, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
       this.manejadorError.resolverErrorApi(error);
     }
   }

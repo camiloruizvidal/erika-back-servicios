@@ -3,6 +3,7 @@ import { PaqueteServicioModel } from '../models/paquete-servicio.model';
 import { ServicioModel } from '../models/servicio.model';
 import { Transformador } from 'src/utils/transformador.util';
 import { PaqueteModel } from '../models/paquete.model';
+import { IPaqueteServicio } from '../interfaces/paquete-servicio.interface';
 
 export class PaqueteServicioRepository {
   static async crearRelacion(
@@ -10,8 +11,8 @@ export class PaqueteServicioRepository {
     servicioId: number,
     tenantId: number,
     transaction: Transaction,
-  ): Promise<PaqueteServicioModel> {
-    return PaqueteServicioModel.create(
+  ): Promise<IPaqueteServicio> {
+    const relacion = await PaqueteServicioModel.create(
       {
         paqueteId,
         servicioId,
@@ -19,6 +20,7 @@ export class PaqueteServicioRepository {
       },
       { transaction },
     );
+    return Transformador.extraerDataValues(relacion);
   }
 
   static async registrarServiciosEnPaquete(
@@ -27,9 +29,15 @@ export class PaqueteServicioRepository {
       servicioId: number;
       tenantId: number;
     }>,
+    transaction?: Transaction,
   ): Promise<void> {
+    if (registros.length === 0) {
+      return;
+    }
+
     await PaqueteServicioModel.bulkCreate(registros, {
       ignoreDuplicates: true,
+      transaction,
     });
   }
 
@@ -46,5 +54,40 @@ export class PaqueteServicioRepository {
       ],
     });
     return Transformador.extraerDataValues(paquete);
+  }
+
+  static async obtenerIdsServiciosPorPaquete(
+    paqueteId: number,
+    tenantId: number,
+  ): Promise<number[]> {
+    const relaciones = await PaqueteServicioModel.findAll({
+      where: {
+        paqueteId,
+        tenantId,
+      },
+      attributes: ['servicioId'],
+    });
+
+    return relaciones.map((relacion) => relacion.servicioId);
+  }
+
+  static async eliminarServiciosDePaquete(
+    paqueteId: number,
+    tenantId: number,
+    serviciosIds: number[],
+    transaction?: Transaction,
+  ): Promise<void> {
+    if (serviciosIds.length === 0) {
+      return;
+    }
+
+    await PaqueteServicioModel.destroy({
+      where: {
+        paqueteId,
+        tenantId,
+        servicioId: serviciosIds,
+      },
+      transaction,
+    });
   }
 }

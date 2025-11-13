@@ -10,17 +10,14 @@ import {
 import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
-import { CrearServicioDto } from '../dto/crear-servicio.dto';
-import { ServicioCreadoDto } from '../dto/servicio-creado.dto';
+import { CrearServicioRequestDto } from '../dto/crear-servicio.request.dto';
+import { ServicioCreadoResponseDto } from '../dto/servicio-creado.response.dto';
 import { ServiciosService } from '../../application/services/servicios.service';
 import { ManejadorError } from '../../utils/manejador-error/manejador-error';
 import { ServiciosMapper } from '../../shared/mappings/servicios.mapper';
 import { JwtTenantGuard } from '../guards/jwt-tenant.guard';
-import { ErrorPersonalizado } from '../../utils/error-personalizado/error-personalizado';
-import { Constantes } from '../../utils/constantes';
-
 interface RequestConTenant extends Request {
-  tenantId?: number;
+  tenantId: number;
 }
 
 @ApiTags('services')
@@ -34,26 +31,17 @@ export class ServiciosController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtTenantGuard)
-  @ApiBody({ type: CrearServicioDto })
-  @ApiCreatedResponse({ type: ServicioCreadoDto })
+  @ApiBody({ type: CrearServicioRequestDto })
+  @ApiCreatedResponse({ type: ServicioCreadoResponseDto })
   public async crear(
-    @Body() dto: CrearServicioDto,
+    @Body() dto: CrearServicioRequestDto,
     @Req() request: RequestConTenant,
-  ): Promise<ServicioCreadoDto> {
+  ): Promise<ServicioCreadoResponseDto> {
     try {
       const tenantId = request.tenantId;
-
-      if (tenantId === undefined) {
-        throw new ErrorPersonalizado(
-          HttpStatus.UNAUTHORIZED,
-          Constantes.TOKEN_SIN_CLAIMS,
-        );
-      }
-
       const payload = ServiciosMapper.toInterface(dto, tenantId);
       const servicio = await this.serviciosService.crearServicio(payload);
-
-      return plainToInstance(ServicioCreadoDto, servicio, {
+      return plainToInstance(ServicioCreadoResponseDto, servicio, {
         excludeExtraneousValues: true,
       });
     } catch (error) {
@@ -61,4 +49,3 @@ export class ServiciosController {
     }
   }
 }
-

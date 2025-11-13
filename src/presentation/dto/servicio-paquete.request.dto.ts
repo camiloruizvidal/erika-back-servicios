@@ -1,23 +1,15 @@
 import { Expose, Transform } from 'class-transformer';
 import { IsNumber, IsString, Min, MinLength } from 'class-validator';
 import { Constantes } from '../../utils/constantes';
+import { TransformadoresDto } from '../utils/transformadores-dto.helper';
 
-type EntradaNumerica = string | number | null | undefined;
-
-const transformarNumero = (valor: EntradaNumerica): number | undefined => {
-  if (valor === undefined || valor === null || valor === '') {
-    return undefined;
-  }
-  return typeof valor === 'number' ? valor : Number(valor);
-};
-
-export class ServicioPaqueteDto {
+export class ServicioPaqueteRequestDto {
   @IsString({ message: Constantes.PROPIEDAD_NO_PERMITIDA('nombre_servicio') })
   @MinLength(2)
   @Expose({ name: 'nombre_servicio' })
   nombreServicio!: string;
 
-  @Transform(({ value }) => transformarNumero(value))
+  @Transform(({ value }) => TransformadoresDto.transformarNumero(value))
   @IsNumber(
     {},
     { message: Constantes.PROPIEDAD_NO_PERMITIDA('valor_servicio') },
@@ -26,3 +18,4 @@ export class ServicioPaqueteDto {
   @Expose({ name: 'valor_servicio' })
   valorServicio!: number;
 }
+

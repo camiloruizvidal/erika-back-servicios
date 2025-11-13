@@ -1,7 +1,7 @@
 import { Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ServicioAsociadoDto {
+export class ServicioAsociadoResponseDto {
   @ApiProperty({
     description: 'Identificador único del servicio asociado',
     type: Number,
@@ -30,3 +30,4 @@ export class ServicioAsociadoDto {
   @Expose()
   valor!: number | null;
 }
+

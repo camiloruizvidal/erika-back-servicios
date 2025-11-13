@@ -1,11 +1,14 @@
-import { CrearPaqueteDto } from '../../presentation/dto/crear-paquete.dto';
+import { CrearPaqueteRequestDto } from '../../presentation/dto/crear-paquete.request.dto';
 import {
   ICrearPaquete,
   IServicioPaqueteDetalle,
 } from '../../domain/interfaces/paquetes.interface';
 
 export class PaquetesMapper {
-  static toInterface(dto: CrearPaqueteDto, tenantId: number): ICrearPaquete {
+  static toInterface(
+    dto: CrearPaqueteRequestDto,
+    tenantId: number,
+  ): ICrearPaquete {
     return {
       tenantId,
       nombre: dto.nombre.trim(),
@@ -18,7 +21,7 @@ export class PaquetesMapper {
   }
 
   private static mapearServicio(
-    servicio: CrearPaqueteDto['servicios'][number],
+    servicio: CrearPaqueteRequestDto['servicios'][number],
   ): IServicioPaqueteDetalle {
     return {
       nombre: servicio.nombreServicio.trim(),

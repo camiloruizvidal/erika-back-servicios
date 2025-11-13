@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/sequelize';
 import { IPaquetesService } from '../ports/paquetes.port';
 import {
   ICrearPaquete,
@@ -8,13 +9,16 @@ import {
 import { PaqueteRepository } from '../../infrastructure/persistence/repositories/paquete.repository';
 import { ServicioRepository } from '../../infrastructure/persistence/repositories/servicio.repository';
 import { PaqueteServicioRepository } from '../../infrastructure/persistence/repositories/paquete-servicio.repository';
-import { ServicioModel } from '../../infrastructure/persistence/models/servicio.model';
 import { ErrorPersonalizado } from '../../utils/error-personalizado/error-personalizado';
 import { Constantes } from '../../utils/constantes';
 import * as moment from 'moment';
+import { Sequelize } from 'sequelize-typescript';
+import { IServicio } from '../../infrastructure/persistence/interfaces/servicio.interface';
 
 @Injectable()
 export class PaquetesService implements IPaquetesService {
+  constructor(@InjectConnection() private readonly sequelize: Sequelize) {}
+
   public async crearPaquete(payload: ICrearPaquete): Promise<IPaqueteCreado> {
     this.validarServicios(payload.servicios);
     this.validarFechas(payload.fechaInicio, payload.fechaFin ?? null);
@@ -56,7 +60,7 @@ export class PaquetesService implements IPaquetesService {
       (servicio) => !nombresExistentes.has(servicio.nombre.toLowerCase()),
     );
 
-    let serviciosNuevos: ServicioModel[] = [];
+    let serviciosNuevos: IServicio[] = [];
     if (serviciosParaCrear.length > 0) {
       const registrosServicios = serviciosParaCrear.map((servicio) => ({
         tenantId: payload.tenantId,
@@ -84,6 +88,98 @@ export class PaquetesService implements IPaquetesService {
       )) as IPaqueteCreado;
 
     return paqueteConServicios;
+  }
+
+  public async actualizarServiciosPaquete(
+    tenantId: number,
+    paqueteId: number,
+    servicioIds: number[],
+  ): Promise<IPaqueteCreado> {
+    const paquete = await PaqueteRepository.buscarPorId(paqueteId, tenantId);
+
+    if (!paquete) {
+      throw new ErrorPersonalizado(
+        HttpStatus.NOT_FOUND,
+        Constantes.PAQUETE_NO_ENCONTRADO,
+      );
+    }
+
+    const idsUnicos = Array.from(new Set(servicioIds));
+
+    if (idsUnicos.length !== servicioIds.length) {
+      throw new ErrorPersonalizado(
+        HttpStatus.BAD_REQUEST,
+        Constantes.SERVICIO_DUPLICADO_EN_SOLICITUD,
+      );
+    }
+
+    if (idsUnicos.length > 0) {
+      const servicios = await ServicioRepository.buscarPorIds(
+        tenantId,
+        idsUnicos,
+      );
+
+      if (servicios.length !== idsUnicos.length) {
+        throw new ErrorPersonalizado(
+          HttpStatus.BAD_REQUEST,
+          Constantes.SERVICIOS_NO_ENCONTRADOS,
+        );
+      }
+    }
+
+    const serviciosActuales =
+      await PaqueteServicioRepository.obtenerIdsServiciosPorPaquete(
+        paqueteId,
+        tenantId,
+      );
+
+    const setActuales = new Set(serviciosActuales);
+    const setNuevos = new Set(idsUnicos);
+
+    const serviciosAgregar = idsUnicos.filter(
+      (id) => !setActuales.has(id),
+    );
+    const serviciosEliminar = serviciosActuales.filter(
+      (id) => !setNuevos.has(id),
+    );
+
+    const transaction = await this.sequelize.transaction();
+
+    try {
+      if (serviciosEliminar.length > 0) {
+        await PaqueteServicioRepository.eliminarServiciosDePaquete(
+          paqueteId,
+          tenantId,
+          serviciosEliminar,
+          transaction,
+        );
+      }
+
+      if (serviciosAgregar.length > 0) {
+        const registros = serviciosAgregar.map((servicioId) => ({
+          paqueteId,
+          servicioId,
+          tenantId,
+        }));
+
+        await PaqueteServicioRepository.registrarServiciosEnPaquete(
+          registros,
+          transaction,
+        );
+      }
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+
+    const paqueteActualizado =
+      (await PaqueteServicioRepository.obtenerServiciosAsociados(
+        paqueteId,
+      )) as IPaqueteCreado;
+
+    return paqueteActualizado;
   }
 
   private validarServicios(servicios: IServicioPaqueteDetalle[]): void {

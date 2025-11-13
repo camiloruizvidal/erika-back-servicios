@@ -1,8 +1,8 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { ServicioAsociadoDto } from './servicio-asociado.dto';
+import { ServicioAsociadoResponseDto } from './servicio-asociado.response.dto';
 
-export class PaqueteCreadoDto {
+export class PaqueteCreadoResponseDto {
   @ApiProperty({
     description: 'Identificador único generado para el paquete',
     type: Number,
@@ -27,7 +27,7 @@ export class PaqueteCreadoDto {
   })
   @Transform(({ value }) => Number(value))
   @Expose()
-  valor: number;
+  valor!: number;
 
   @ApiProperty({
     description: 'Fecha desde la cual el paquete está disponible',
@@ -35,9 +35,9 @@ export class PaqueteCreadoDto {
     format: 'date-time',
     example: '2025-11-23T00:00:00.000Z',
   })
-  @Expose()
+  @Expose({ name: 'fechaInicio' })
   @Type(() => Date)
-  fechaInicio!: Date;
+  fecha_inicio!: Date;
 
   @ApiProperty({
     description:
@@ -48,9 +48,9 @@ export class PaqueteCreadoDto {
     nullable: true,
     example: null,
   })
-  @Expose()
+  @Expose({ name: 'fechaFin' })
   @Type(() => Date)
-  fechaFin!: Date | null;
+  fecha_fin!: Date | null;
 
   @ApiProperty({
     description: 'Indicador de estado activo del paquete',
@@ -62,9 +62,10 @@ export class PaqueteCreadoDto {
 
   @ApiProperty({
     description: 'Servicios incluidos dentro del paquete',
-    type: () => [ServicioAsociadoDto],
+    type: () => [ServicioAsociadoResponseDto],
   })
   @Expose()
-  @Type(() => ServicioAsociadoDto)
-  servicios!: ServicioAsociadoDto[];
+  @Type(() => ServicioAsociadoResponseDto)
+  servicios!: ServicioAsociadoResponseDto[];
 }
+

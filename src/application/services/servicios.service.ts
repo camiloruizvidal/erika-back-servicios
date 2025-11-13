@@ -9,6 +9,7 @@ import { PaqueteRepository } from '../../infrastructure/persistence/repositories
 import { PaqueteServicioRepository } from '../../infrastructure/persistence/repositories/paquete-servicio.repository';
 import { ErrorPersonalizado } from '../../utils/error-personalizado/error-personalizado';
 import { Constantes } from '../../utils/constantes';
+import { IServicio } from '../../infrastructure/persistence/interfaces/servicio.interface';
 
 @Injectable()
 export class ServiciosService implements IServiciosService {
@@ -29,15 +30,10 @@ export class ServiciosService implements IServiciosService {
       );
     }
 
-    const paqueteIdSolicitado =
-      payload.paqueteId !== undefined && payload.paqueteId !== null
-        ? payload.paqueteId
-        : null;
-
     let paqueteRelacionado: number | null = null;
-    if (paqueteIdSolicitado !== null) {
+    if (payload.paqueteId) {
       const paquete = await PaqueteRepository.buscarPorId(
-        paqueteIdSolicitado,
+        payload.paqueteId,
         payload.tenantId,
       );
 
@@ -57,7 +53,13 @@ export class ServiciosService implements IServiciosService {
       valor: payload.valor,
     });
 
-    if (paqueteRelacionado !== null) {
+    const servicioResultado: IServicioCreado = {
+      id: servicioCreado.id,
+      nombre: servicioCreado.nombre,
+      valor: Number(servicioCreado.valor),
+    };
+
+    if (paqueteRelacionado) {
       await PaqueteServicioRepository.registrarServiciosEnPaquete([
         {
           paqueteId: paqueteRelacionado,
@@ -65,14 +67,9 @@ export class ServiciosService implements IServiciosService {
           tenantId: payload.tenantId,
         },
       ]);
+      servicioResultado['paqueteId'] = paqueteRelacionado;
     }
 
-    return {
-      id: servicioCreado.id,
-      nombre: servicioCreado.nombre,
-      valor: Number(servicioCreado.valor),
-      paqueteId: paqueteRelacionado,
-    };
+    return servicioResultado;
   }
 }
-

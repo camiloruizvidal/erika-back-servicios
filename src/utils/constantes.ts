@@ -23,6 +23,8 @@ export class Constantes {
     'Debe registrar al menos un servicio para crear el paquete';
   static readonly SERVICIO_DUPLICADO_EN_SOLICITUD =
     'Existen servicios duplicados en la solicitud';
+  static readonly SERVICIOS_NO_ENCONTRADOS =
+    'Alguno de los servicios indicados no existe para este tenant';
   static readonly FECHA_FIN_ANTERIOR =
     'La fecha de fin no puede ser anterior a la fecha de inicio';
   static readonly TRANSACCION_NO_DISPONIBLE =

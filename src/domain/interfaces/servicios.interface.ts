@@ -9,6 +9,5 @@ export interface IServicioCreado {
   id: number;
   nombre: string;
   valor: number;
-  paqueteId: number | null;
+  paqueteId?: number;
 }
-

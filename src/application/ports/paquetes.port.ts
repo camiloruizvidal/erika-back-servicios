@@ -5,4 +5,9 @@ import {
 
 export interface IPaquetesService {
   crearPaquete(payload: ICrearPaquete): Promise<IPaqueteCreado>;
+  actualizarServiciosPaquete(
+    tenantId: number,
+    paqueteId: number,
+    servicioIds: number[],
+  ): Promise<IPaqueteCreado>;
 }

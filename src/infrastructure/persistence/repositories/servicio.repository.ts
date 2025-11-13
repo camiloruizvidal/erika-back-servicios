@@ -1,30 +1,31 @@
-import { Op, Transaction } from 'sequelize';
+import { Op } from 'sequelize';
 import { ServicioModel } from '../models/servicio.model';
+import { Transformador } from 'src/utils/transformador.util';
+import { IServicio } from '../interfaces/servicio.interface';
 
 export class ServicioRepository {
   static async buscarPorNombre(
     nombre: string,
     tenantId: number,
-    transaction?: Transaction,
-  ): Promise<ServicioModel | null> {
-    return ServicioModel.findOne({
+  ): Promise<IServicio | null> {
+    const servicio = await ServicioModel.findOne({
       where: {
         nombre,
         tenantId,
       },
-      transaction,
     });
+    return Transformador.extraerDataValues(servicio);
   }
 
   static async buscarPorNombres(
     tenantId: number,
     nombres: string[],
-  ): Promise<ServicioModel[]> {
+  ): Promise<IServicio[]> {
     if (nombres.length === 0) {
       return [];
     }
 
-    return ServicioModel.findAll({
+    const servicios = await ServicioModel.findAll({
       where: {
         tenantId,
         nombre: {
@@ -32,23 +33,47 @@ export class ServicioRepository {
         },
       },
     });
+    return Transformador.extraerDataValues(servicios);
   }
 
   static async crearServicios(
     registros: Array<{ tenantId: number; nombre: string; valor: number }>,
-  ): Promise<ServicioModel[]> {
+  ): Promise<IServicio[]> {
     if (registros.length === 0) {
       return [];
     }
 
-    return ServicioModel.bulkCreate(registros, {
+    const servicios = await ServicioModel.bulkCreate(registros, {
       returning: true,
     });
+    return Transformador.extraerDataValues(servicios);
   }
 
-  static async crearServicio(
-    registro: { tenantId: number; nombre: string; valor: number },
-  ): Promise<ServicioModel> {
-    return ServicioModel.create(registro);
+  static async crearServicio(registro: {
+    tenantId: number;
+    nombre: string;
+    valor: number;
+  }): Promise<IServicio> {
+    const servicio = await ServicioModel.create(registro);
+    return Transformador.extraerDataValues(servicio);
+  }
+
+  static async buscarPorIds(
+    tenantId: number,
+    ids: number[],
+  ): Promise<IServicio[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const servicios = await ServicioModel.findAll({
+      where: {
+        tenantId,
+        id: {
+          [Op.in]: ids,
+        },
+      },
+    });
+    return Transformador.extraerDataValues(servicios);
   }
 }
