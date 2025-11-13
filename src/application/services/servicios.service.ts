@@ -90,11 +90,15 @@ export class ServiciosService implements IServiciosService {
       tamanoPagina,
     );
 
+    const totalPaginas =
+      tamanoPagina > 0 ? Math.ceil(Number(resultado.count) / tamanoPagina) : 0;
+
     return {
       meta: {
         total: Number(resultado.count),
         pagina,
         tamanoPagina,
+        totalPaginas,
       },
       data: resultado.rows as IServicioConPaquetesListado[],
     };
@@ -124,13 +128,44 @@ export class ServiciosService implements IServiciosService {
       tamanoPagina,
     );
 
+    const totalPaginas =
+      tamanoPagina > 0 ? Math.ceil(Number(resultado.count) / tamanoPagina) : 0;
+
     return {
       meta: {
         total: Number(resultado.count),
         pagina,
         tamanoPagina,
+        totalPaginas,
       },
       data: resultado.rows as IServicioSinPaqueteListado[],
     };
+  }
+
+  public async obtenerDetalleServicio(
+    tenantId: number,
+    servicioId: number,
+  ): Promise<IServicioConPaquetesListado> {
+    const servicio = await ServicioRepository.buscarPorId(tenantId, servicioId);
+
+    if (!servicio) {
+      throw new ErrorPersonalizado(
+        HttpStatus.NOT_FOUND,
+        Constantes.SERVICIOS_NO_ENCONTRADOS,
+      );
+    }
+
+    const servicioDetallado: IServicioConPaquetesListado = {
+      id: servicio.id,
+      nombre: servicio.nombre,
+      valor: Number(servicio.valor),
+      paquetes:
+        servicio.paquetes?.map((paquete) => ({
+          id: paquete.id,
+          nombre: paquete.nombre,
+        })) ?? [],
+    };
+
+    return servicioDetallado;
   }
 }

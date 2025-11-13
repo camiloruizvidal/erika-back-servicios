@@ -86,6 +86,27 @@ export class PaquetesService implements IPaquetesService {
     return paqueteConServicios;
   }
 
+  public async obtenerDetallePaquete(
+    tenantId: number,
+    paqueteId: number,
+  ): Promise<IPaqueteCreado> {
+    const paquete = await PaqueteRepository.buscarPorId(paqueteId, tenantId);
+
+    if (!paquete) {
+      throw new ErrorPersonalizado(
+        HttpStatus.NOT_FOUND,
+        Constantes.PAQUETE_NO_ENCONTRADO,
+      );
+    }
+
+    const paqueteConServicios =
+      (await PaqueteServicioRepository.obtenerServiciosAsociados(
+        paquete.id,
+      )) as IPaqueteCreado;
+
+    return paqueteConServicios;
+  }
+
   public async actualizarServiciosPaquete(
     tenantId: number,
     paqueteId: number,

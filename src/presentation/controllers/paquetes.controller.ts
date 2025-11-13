@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Logger,
@@ -38,6 +39,30 @@ export class PaquetesController {
     private readonly paquetesService: PaquetesService,
     private readonly manejadorError: ManejadorError,
   ) {}
+
+  @Get(':paqueteId')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtTenantGuard)
+  @ApiOkResponse({ type: PaqueteCreadoResponseDto })
+  public async obtenerDetalle(
+    @Param('paqueteId', ParseIntPipe) paqueteId: number,
+    @Req() request: RequestConTenant,
+  ): Promise<PaqueteCreadoResponseDto> {
+    try {
+      const tenantId = request.tenantId;
+      const paquete = await this.paquetesService.obtenerDetallePaquete(
+        tenantId,
+        paqueteId,
+      );
+
+      return plainToInstance(PaqueteCreadoResponseDto, paquete, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
+      this.manejadorError.resolverErrorApi(error);
+    }
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

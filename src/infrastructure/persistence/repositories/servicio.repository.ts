@@ -79,6 +79,27 @@ export class ServicioRepository {
     return Transformador.extraerDataValues(servicios) as IServicio[];
   }
 
+  static async buscarPorId(
+    tenantId: number,
+    servicioId: number,
+  ): Promise<IServicio | null> {
+    const servicio = await ServicioModel.findOne({
+      where: {
+        tenantId,
+        id: servicioId,
+      },
+      include: [
+        {
+          model: PaqueteModel,
+          attributes: ['id', 'nombre'],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    return Transformador.extraerDataValues(servicio) as IServicio | null;
+  }
+
   static async listarTodos(
     tenantId: number,
     offset: number,

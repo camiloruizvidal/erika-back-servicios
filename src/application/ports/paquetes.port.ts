@@ -10,4 +10,8 @@ export interface IPaquetesService {
     paqueteId: number,
     servicioIds: number[],
   ): Promise<IPaqueteCreado>;
+  obtenerDetallePaquete(
+    tenantId: number,
+    paqueteId: number,
+  ): Promise<IPaqueteCreado>;
 }

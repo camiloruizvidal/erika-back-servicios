@@ -31,6 +31,7 @@ import {
   ServiciosSinPaquetePaginadosResponseDto,
   ServiciosConPaquetesPaginadosResponseDto,
 } from '../dto/paginado.response.dto';
+import { ServicioConPaquetesResponseDto } from '../dto/servicio-listado.response.dto';
 
 interface RequestConTenant extends Request {
   tenantId: number;
@@ -104,6 +105,30 @@ export class ServiciosController {
           excludeExtraneousValues: true,
         },
       );
+    } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
+      this.manejadorError.resolverErrorApi(error);
+    }
+  }
+
+  @Get(':servicioId')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtTenantGuard)
+  @ApiOkResponse({ type: ServicioConPaquetesResponseDto })
+  public async obtenerDetalle(
+    @Param('servicioId', ParseIntPipe) servicioId: number,
+    @Req() request: RequestConTenant,
+  ): Promise<ServicioConPaquetesResponseDto> {
+    try {
+      const tenantId = request.tenantId;
+      const servicio = await this.serviciosService.obtenerDetalleServicio(
+        tenantId,
+        servicioId,
+      );
+
+      return plainToInstance(ServicioConPaquetesResponseDto, servicio, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       Logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
