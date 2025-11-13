@@ -1,4 +1,3 @@
-import { Transaction } from 'sequelize';
 import { PaqueteServicioModel } from '../models/paquete-servicio.model';
 import { ServicioModel } from '../models/servicio.model';
 import { Transformador } from 'src/utils/transformador.util';
@@ -10,16 +9,12 @@ export class PaqueteServicioRepository {
     paqueteId: number,
     servicioId: number,
     tenantId: number,
-    transaction: Transaction,
   ): Promise<IPaqueteServicio> {
-    const relacion = await PaqueteServicioModel.create(
-      {
-        paqueteId,
-        servicioId,
-        tenantId,
-      },
-      { transaction },
-    );
+    const relacion = await PaqueteServicioModel.create({
+      paqueteId,
+      servicioId,
+      tenantId,
+    });
     return Transformador.extraerDataValues(relacion);
   }
 
@@ -29,7 +24,6 @@ export class PaqueteServicioRepository {
       servicioId: number;
       tenantId: number;
     }>,
-    transaction?: Transaction,
   ): Promise<void> {
     if (registros.length === 0) {
       return;
@@ -37,7 +31,6 @@ export class PaqueteServicioRepository {
 
     await PaqueteServicioModel.bulkCreate(registros, {
       ignoreDuplicates: true,
-      transaction,
     });
   }
 
@@ -75,7 +68,6 @@ export class PaqueteServicioRepository {
     paqueteId: number,
     tenantId: number,
     serviciosIds: number[],
-    transaction?: Transaction,
   ): Promise<void> {
     if (serviciosIds.length === 0) {
       return;
@@ -87,7 +79,6 @@ export class PaqueteServicioRepository {
         tenantId,
         servicioId: serviciosIds,
       },
-      transaction,
     });
   }
 }

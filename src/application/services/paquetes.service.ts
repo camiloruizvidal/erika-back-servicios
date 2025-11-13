@@ -1,5 +1,4 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/sequelize';
 import { IPaquetesService } from '../ports/paquetes.port';
 import {
   ICrearPaquete,
@@ -12,13 +11,10 @@ import { PaqueteServicioRepository } from '../../infrastructure/persistence/repo
 import { ErrorPersonalizado } from '../../utils/error-personalizado/error-personalizado';
 import { Constantes } from '../../utils/constantes';
 import * as moment from 'moment';
-import { Sequelize } from 'sequelize-typescript';
 import { IServicio } from '../../infrastructure/persistence/interfaces/servicio.interface';
 
 @Injectable()
 export class PaquetesService implements IPaquetesService {
-  constructor(@InjectConnection() private readonly sequelize: Sequelize) {}
-
   public async crearPaquete(payload: ICrearPaquete): Promise<IPaqueteCreado> {
     this.validarServicios(payload.servicios);
     this.validarFechas(payload.fechaInicio, payload.fechaFin ?? null);
@@ -143,35 +139,22 @@ export class PaquetesService implements IPaquetesService {
       (id) => !setNuevos.has(id),
     );
 
-    const transaction = await this.sequelize.transaction();
+    if (serviciosEliminar.length > 0) {
+      await PaqueteServicioRepository.eliminarServiciosDePaquete(
+        paqueteId,
+        tenantId,
+        serviciosEliminar,
+      );
+    }
 
-    try {
-      if (serviciosEliminar.length > 0) {
-        await PaqueteServicioRepository.eliminarServiciosDePaquete(
-          paqueteId,
-          tenantId,
-          serviciosEliminar,
-          transaction,
-        );
-      }
+    if (serviciosAgregar.length > 0) {
+      const registros = serviciosAgregar.map((servicioId) => ({
+        paqueteId,
+        servicioId,
+        tenantId,
+      }));
 
-      if (serviciosAgregar.length > 0) {
-        const registros = serviciosAgregar.map((servicioId) => ({
-          paqueteId,
-          servicioId,
-          tenantId,
-        }));
-
-        await PaqueteServicioRepository.registrarServiciosEnPaquete(
-          registros,
-          transaction,
-        );
-      }
-
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
+      await PaqueteServicioRepository.registrarServiciosEnPaquete(registros);
     }
 
     const paqueteActualizado =
