@@ -77,37 +77,14 @@ export class ServiciosService implements IServiciosService {
     return servicioResultado;
   }
 
-  public async listarServiciosSinPaquete(
-    tenantId: number,
-    pagina: number,
-    tamanoPagina: number,
-  ): Promise<IPaginado<IServicioSinPaqueteListado>> {
-    const offset = (pagina - 1) * tamanoPagina;
-
-    const resultado = await ServicioRepository.listarSinPaquete(
-      tenantId,
-      offset,
-      tamanoPagina,
-    );
-
-    return {
-      meta: {
-        total: Number(resultado.count),
-        pagina,
-        tamanoPagina,
-      },
-      data: resultado.rows as IServicioSinPaqueteListado[],
-    };
-  }
-
-  public async listarServiciosDePaquetes(
+  public async listarServicios(
     tenantId: number,
     pagina: number,
     tamanoPagina: number,
   ): Promise<IPaginado<IServicioConPaquetesListado>> {
     const offset = (pagina - 1) * tamanoPagina;
 
-    const resultado = await ServicioRepository.listarConPaquetes(
+    const resultado = await ServicioRepository.listarTodos(
       tenantId,
       offset,
       tamanoPagina,
@@ -120,6 +97,40 @@ export class ServiciosService implements IServiciosService {
         tamanoPagina,
       },
       data: resultado.rows as IServicioConPaquetesListado[],
+    };
+  }
+
+  public async listarServiciosDePaquetes(
+    tenantId: number,
+    paqueteId: number,
+    pagina: number,
+    tamanoPagina: number,
+  ): Promise<IPaginado<IServicioSinPaqueteListado>> {
+    const offset = (pagina - 1) * tamanoPagina;
+
+    const paquete = await PaqueteRepository.buscarPorId(paqueteId, tenantId);
+
+    if (!paquete) {
+      throw new ErrorPersonalizado(
+        HttpStatus.NOT_FOUND,
+        Constantes.PAQUETE_NO_ENCONTRADO,
+      );
+    }
+
+    const resultado = await ServicioRepository.listarConPaquetes(
+      tenantId,
+      paqueteId,
+      offset,
+      tamanoPagina,
+    );
+
+    return {
+      meta: {
+        total: Number(resultado.count),
+        pagina,
+        tamanoPagina,
+      },
+      data: resultado.rows as IServicioSinPaqueteListado[],
     };
   }
 }

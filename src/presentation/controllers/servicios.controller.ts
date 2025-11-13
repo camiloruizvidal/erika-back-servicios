@@ -6,6 +6,8 @@ import {
   HttpStatus,
   Logger,
   Post,
+  Param,
+  ParseIntPipe,
   Query,
   Req,
   UseGuards,
@@ -45,24 +47,24 @@ export class ServiciosController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtTenantGuard)
-  @ApiOkResponse({ type: ServiciosSinPaquetePaginadosResponseDto })
-  public async listarSinPaquetes(
+  @ApiOkResponse({ type: ServiciosConPaquetesPaginadosResponseDto })
+  public async listar(
     @Query() query: PaginadoRequestDto,
     @Req() request: RequestConTenant,
-  ): Promise<ServiciosSinPaquetePaginadosResponseDto> {
+  ): Promise<ServiciosConPaquetesPaginadosResponseDto> {
     try {
       const tenantId = request.tenantId;
       const pagina = query.pagina ?? 1;
       const tamanoPagina = query.tamanoPagina ?? 10;
 
-      const resultado = await this.serviciosService.listarServiciosSinPaquete(
+      const resultado = await this.serviciosService.listarServicios(
         tenantId,
         pagina,
         tamanoPagina,
       );
 
       return plainToInstance(
-        ServiciosSinPaquetePaginadosResponseDto,
+        ServiciosConPaquetesPaginadosResponseDto,
         resultado,
         {
           excludeExtraneousValues: true,
@@ -74,14 +76,15 @@ export class ServiciosController {
     }
   }
 
-  @Get('packages')
+  @Get('packages/:paqueteId')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtTenantGuard)
-  @ApiOkResponse({ type: ServiciosConPaquetesPaginadosResponseDto })
-  public async listarConPaquetes(
+  @ApiOkResponse({ type: ServiciosSinPaquetePaginadosResponseDto })
+  public async listarPorPaquete(
+    @Param('paqueteId', ParseIntPipe) paqueteId: number,
     @Query() query: PaginadoRequestDto,
     @Req() request: RequestConTenant,
-  ): Promise<ServiciosConPaquetesPaginadosResponseDto> {
+  ): Promise<ServiciosSinPaquetePaginadosResponseDto> {
     try {
       const tenantId = request.tenantId;
       const pagina = query.pagina ?? 1;
@@ -89,12 +92,13 @@ export class ServiciosController {
 
       const resultado = await this.serviciosService.listarServiciosDePaquetes(
         tenantId,
+        paqueteId,
         pagina,
         tamanoPagina,
       );
 
       return plainToInstance(
-        ServiciosConPaquetesPaginadosResponseDto,
+        ServiciosSinPaquetePaginadosResponseDto,
         resultado,
         {
           excludeExtraneousValues: true,

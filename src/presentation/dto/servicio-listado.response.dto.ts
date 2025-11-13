@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 
 export class ServicioListadoResponseDto {
   @ApiProperty({ description: 'Identificador del servicio', type: Number })
@@ -37,6 +37,7 @@ export class ServicioConPaquetesResponseDto {
     type: () => [ServicioConPaquetesItemResponseDto],
   })
   @Expose({ name: 'paquetes' })
+  @Type(() => ServicioConPaquetesItemResponseDto)
   paquetes!: ServicioConPaquetesItemResponseDto[];
 }
 

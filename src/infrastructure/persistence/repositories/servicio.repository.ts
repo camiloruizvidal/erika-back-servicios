@@ -79,6 +79,33 @@ export class ServicioRepository {
     return Transformador.extraerDataValues(servicios) as IServicio[];
   }
 
+  static async listarTodos(
+    tenantId: number,
+    offset: number,
+    limit: number,
+  ): Promise<IResultadoFindAndCount<IServicio>> {
+    const resultado = await ServicioModel.findAndCountAll({
+      where: {
+        tenantId,
+      },
+      include: [
+        {
+          model: PaqueteModel,
+          attributes: ['id', 'nombre'],
+          through: { attributes: [] },
+          required: false,
+        },
+      ],
+      distinct: true,
+      offset,
+      limit,
+      order: [['created_at', 'DESC']],
+    });
+    return Transformador.extraerDataValues(
+      resultado,
+    ) as IResultadoFindAndCount<IServicio>;
+  }
+
   static async listarSinPaquete(
     tenantId: number,
     offset: number,
@@ -109,6 +136,7 @@ export class ServicioRepository {
 
   static async listarConPaquetes(
     tenantId: number,
+    paqueteId: number,
     offset: number,
     limit: number,
   ): Promise<IResultadoFindAndCount<IServicio>> {
@@ -119,8 +147,11 @@ export class ServicioRepository {
       include: [
         {
           model: PaqueteModel,
-          attributes: ['id', 'nombre'],
+          attributes: [],
           through: { attributes: [] },
+          where: {
+            id: paqueteId,
+          },
           required: true,
         },
       ],

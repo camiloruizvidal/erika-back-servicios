@@ -8,7 +8,7 @@ export interface IServicioConPaquetesListado {
   id: number;
   nombre: string;
   valor: number;
-  paquetes: Array<{
+  paquetes?: Array<{
     id: number;
     nombre: string;
   }>;
