@@ -39,7 +39,7 @@ export class PaqueteListadoResponseDto {
     if (!value) return null;
     return moment.utc(value).format('YYYY-MM-DD');
   })
-  @Expose({ name: 'fecha_inicio' })
+  @Expose({ name: 'fechaInicio' })
   fecha_inicio!: string;
 
   @ApiProperty({
@@ -55,7 +55,7 @@ export class PaqueteListadoResponseDto {
     if (!value) return null;
     return moment.utc(value).format('YYYY-MM-DD');
   })
-  @Expose({ name: 'fecha_fin' })
+  @Expose({ name: 'fechaFin' })
   fecha_fin!: string | null;
 
   @ApiProperty({
@@ -66,4 +66,3 @@ export class PaqueteListadoResponseDto {
   @Expose({ name: 'activo' })
   activo!: boolean;
 }
-
