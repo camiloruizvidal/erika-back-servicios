@@ -2,6 +2,9 @@ import { PaqueteModel } from '../models/paquete.model';
 import { ICrearPaquete } from '../../../domain/interfaces/paquetes.interface';
 import { Transformador } from 'src/utils/transformador.util';
 import { IPaquete } from '../interfaces/paquete.interface';
+import { IResultadoFindAndCount } from '../../../shared/interfaces/sequelize-find.interface';
+import { Op } from 'sequelize';
+import * as moment from 'moment';
 
 export class PaqueteRepository {
   static async buscarPorNombre(
@@ -40,5 +43,52 @@ export class PaqueteRepository {
       },
     });
     return Transformador.extraerDataValues(paquete);
+  }
+
+  static async listarPorTenant(
+    tenantId: number,
+    offset: number,
+    limit: number,
+    nombre?: string,
+    activo?: boolean,
+    fechaInicio?: string,
+    fechaFin?: string,
+  ): Promise<IResultadoFindAndCount<IPaquete>> {
+    const whereClause: any = {
+      tenantId,
+    };
+
+    if (nombre && nombre.trim().length > 0) {
+      whereClause.nombre = { [Op.iLike]: `%${nombre.trim()}%` };
+    }
+
+    if (activo !== undefined && activo !== null) {
+      whereClause.activo = activo;
+    }
+
+    if (fechaInicio) {
+      const fechaInicioMoment = moment.utc(fechaInicio).startOf('day');
+      whereClause.fechaInicio = {
+        [Op.gte]: fechaInicioMoment.toDate(),
+      };
+    }
+
+    if (fechaFin) {
+      const fechaFinMoment = moment.utc(fechaFin).endOf('day');
+      whereClause.fechaFin = {
+        [Op.lte]: fechaFinMoment.toDate(),
+      };
+    }
+
+    const resultado = await PaqueteModel.findAndCountAll({
+      where: whereClause,
+      offset,
+      limit,
+      order: [['created_at', 'DESC']],
+    });
+
+    return Transformador.extraerDataValues(
+      resultado,
+    ) as IResultadoFindAndCount<IPaquete>;
   }
 }

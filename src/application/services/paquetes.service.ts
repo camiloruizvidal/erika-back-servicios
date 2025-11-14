@@ -12,6 +12,8 @@ import { ErrorPersonalizado } from '../../utils/error-personalizado/error-person
 import { Constantes } from '../../utils/constantes';
 import * as moment from 'moment';
 import { IServicio } from '../../infrastructure/persistence/interfaces/servicio.interface';
+import { IPaginado } from '../../shared/interfaces/paginado.interface';
+import { IPaquete } from '../../infrastructure/persistence/interfaces/paquete.interface';
 
 @Injectable()
 export class PaquetesService implements IPaquetesService {
@@ -84,6 +86,43 @@ export class PaquetesService implements IPaquetesService {
       )) as IPaqueteCreado;
 
     return paqueteConServicios;
+  }
+
+  public async listarPaquetes(
+    tenantId: number,
+    pagina: number,
+    tamanoPagina: number,
+    nombre?: string,
+    activo?: boolean,
+    fechaInicio?: string,
+    fechaFin?: string,
+  ): Promise<IPaginado<IPaquete>> {
+    const offset = (pagina - 1) * tamanoPagina;
+
+    const resultado = await PaqueteRepository.listarPorTenant(
+      tenantId,
+      offset,
+      tamanoPagina,
+      nombre,
+      activo,
+      fechaInicio,
+      fechaFin,
+    );
+
+    const total = resultado.count;
+    const registros: IPaquete[] = resultado.rows;
+    const totalPaginas =
+      tamanoPagina > 0 ? Math.ceil(total / tamanoPagina) : 0;
+
+    return {
+      meta: {
+        total,
+        pagina,
+        tamanoPagina,
+        totalPaginas,
+      },
+      data: registros,
+    };
   }
 
   public async obtenerDetallePaquete(

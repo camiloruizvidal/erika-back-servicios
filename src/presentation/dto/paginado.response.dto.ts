@@ -4,6 +4,7 @@ import {
   ServicioListadoResponseDto,
   ServicioConPaquetesResponseDto,
 } from './servicio-listado.response.dto';
+import { PaqueteListadoResponseDto } from './paquete-listado.response.dto';
 
 export class MetaPaginadoResponseDto {
   @ApiProperty({ description: 'Total de registros encontrados', type: Number })
@@ -58,4 +59,14 @@ export class ServiciosConPaquetesPaginadosResponseDto extends PaginadoResponseDt
   @Expose({ name: 'data' })
   @Type(() => ServicioConPaquetesResponseDto)
   declare data: ServicioConPaquetesResponseDto[];
+}
+
+export class PaquetesPaginadosResponseDto extends PaginadoResponseDto<PaqueteListadoResponseDto> {
+  @ApiProperty({
+    isArray: true,
+    type: () => PaqueteListadoResponseDto,
+  })
+  @Expose({ name: 'data' })
+  @Type(() => PaqueteListadoResponseDto)
+  declare data: PaqueteListadoResponseDto[];
 }

@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -27,6 +28,8 @@ import { PaquetesMapper } from '../../shared/mappings/paquetes.mapper';
 import { PaqueteCreadoResponseDto } from '../dto/paquete-creado.response.dto';
 import { JwtTenantGuard } from '../guards/jwt-tenant.guard';
 import { ActualizarServiciosPaqueteRequestDto } from '../dto/actualizar-servicios-paquete.request.dto';
+import { PaginadoPaquetesRequestDto } from '../dto/paginado-paquetes.request.dto';
+import { PaquetesPaginadosResponseDto } from '../dto/paginado.response.dto';
 
 interface RequestConTenant extends Request {
   tenantId: number;
@@ -39,6 +42,42 @@ export class PaquetesController {
     private readonly paquetesService: PaquetesService,
     private readonly manejadorError: ManejadorError,
   ) {}
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtTenantGuard)
+  @ApiOkResponse({ type: PaquetesPaginadosResponseDto })
+  public async listar(
+    @Query() query: PaginadoPaquetesRequestDto,
+    @Req() request: RequestConTenant,
+  ): Promise<PaquetesPaginadosResponseDto> {
+    try {
+      const tenantId = request.tenantId;
+      const pagina = query.pagina ?? 1;
+      const tamanoPagina = query.tamanoPagina ?? 10;
+      const nombre = query.nombre?.trim() || undefined;
+      const activo = query.activo;
+      const fechaInicio = query.fechaInicio?.trim() || undefined;
+      const fechaFin = query.fechaFin?.trim() || undefined;
+
+      const resultado = await this.paquetesService.listarPaquetes(
+        tenantId,
+        pagina,
+        tamanoPagina,
+        nombre,
+        activo,
+        fechaInicio,
+        fechaFin,
+      );
+
+      return plainToInstance(PaquetesPaginadosResponseDto, resultado, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      Logger.error({ error: JSON.stringify(error) });
+      this.manejadorError.resolverErrorApi(error);
+    }
+  }
 
   @Get(':paqueteId')
   @HttpCode(HttpStatus.OK)
