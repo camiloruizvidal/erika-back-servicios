@@ -14,6 +14,7 @@ export interface IServiciosService {
     tenantId: number,
     pagina: number,
     tamanoPagina: number,
+    nombre?: string,
   ): Promise<IPaginado<IServicioConPaquetesListado>>;
   listarServiciosDePaquetes(
     tenantId: number,

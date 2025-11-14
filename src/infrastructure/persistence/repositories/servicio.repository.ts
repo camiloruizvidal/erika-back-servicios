@@ -104,11 +104,18 @@ export class ServicioRepository {
     tenantId: number,
     offset: number,
     limit: number,
+    nombre?: string,
   ): Promise<IResultadoFindAndCount<IServicio>> {
+    const whereClause: any = {
+      tenantId,
+    };
+
+    if (nombre && nombre.trim().length > 0) {
+      whereClause.nombre = { [Op.iLike]: `%${nombre.trim()}%` };
+    }
+
     const resultado = await ServicioModel.findAndCountAll({
-      where: {
-        tenantId,
-      },
+      where: whereClause,
       include: [
         {
           model: PaqueteModel,

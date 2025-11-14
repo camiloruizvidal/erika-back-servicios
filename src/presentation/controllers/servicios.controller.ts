@@ -27,6 +27,7 @@ import { ManejadorError } from '../../utils/manejador-error/manejador-error';
 import { ServiciosMapper } from '../../shared/mappings/servicios.mapper';
 import { JwtTenantGuard } from '../guards/jwt-tenant.guard';
 import { PaginadoRequestDto } from '../dto/paginado.request.dto';
+import { PaginadoServiciosRequestDto } from '../dto/paginado-servicios.request.dto';
 import {
   ServiciosSinPaquetePaginadosResponseDto,
   ServiciosConPaquetesPaginadosResponseDto,
@@ -50,7 +51,7 @@ export class ServiciosController {
   @UseGuards(JwtTenantGuard)
   @ApiOkResponse({ type: ServiciosConPaquetesPaginadosResponseDto })
   public async listar(
-    @Query() query: PaginadoRequestDto,
+    @Query() query: PaginadoServiciosRequestDto,
     @Req() request: RequestConTenant,
   ): Promise<ServiciosConPaquetesPaginadosResponseDto> {
     try {
@@ -62,6 +63,7 @@ export class ServiciosController {
         tenantId,
         pagina,
         tamanoPagina,
+        query.nombre,
       );
 
       return plainToInstance(

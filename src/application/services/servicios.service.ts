@@ -81,6 +81,7 @@ export class ServiciosService implements IServiciosService {
     tenantId: number,
     pagina: number,
     tamanoPagina: number,
+    nombre?: string,
   ): Promise<IPaginado<IServicioConPaquetesListado>> {
     const offset = (pagina - 1) * tamanoPagina;
 
@@ -88,6 +89,7 @@ export class ServiciosService implements IServiciosService {
       tenantId,
       offset,
       tamanoPagina,
+      nombre,
     );
 
     const totalPaginas =
