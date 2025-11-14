@@ -64,6 +64,7 @@ export class ServiciosController {
         pagina,
         tamanoPagina,
         query.nombre,
+        query.paqueteId,
       );
 
       return plainToInstance(

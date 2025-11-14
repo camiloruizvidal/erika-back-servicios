@@ -105,6 +105,7 @@ export class ServicioRepository {
     offset: number,
     limit: number,
     nombre?: string,
+    paqueteId?: number,
   ): Promise<IResultadoFindAndCount<IServicio>> {
     const whereClause: any = {
       tenantId,
@@ -114,16 +115,21 @@ export class ServicioRepository {
       whereClause.nombre = { [Op.iLike]: `%${nombre.trim()}%` };
     }
 
+    const includeOptions: any = {
+      model: PaqueteModel,
+      attributes: ['id', 'nombre'],
+      through: { attributes: [] },
+      required: false,
+    };
+
+    if (paqueteId) {
+      includeOptions.where = { id: paqueteId };
+      includeOptions.required = true;
+    }
+
     const resultado = await ServicioModel.findAndCountAll({
       where: whereClause,
-      include: [
-        {
-          model: PaqueteModel,
-          attributes: ['id', 'nombre'],
-          through: { attributes: [] },
-          required: false,
-        },
-      ],
+      include: [includeOptions],
       distinct: true,
       offset,
       limit,
