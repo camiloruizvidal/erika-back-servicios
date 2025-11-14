@@ -163,11 +163,7 @@ export class ServiciosService implements IServiciosService {
       id: servicio.id,
       nombre: servicio.nombre,
       valor: Number(servicio.valor),
-      paquetes:
-        servicio.paquetes?.map((paquete) => ({
-          id: paquete.id,
-          nombre: paquete.nombre,
-        })) ?? [],
+      paquetes: servicio.paquetes,
     };
 
     return servicioDetallado;

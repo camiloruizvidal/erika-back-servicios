@@ -66,7 +66,7 @@ export class ServiciosController {
         query.nombre,
         query.paqueteId,
       );
-
+      console.log({ resultado: JSON.stringify(resultado) });
       return plainToInstance(
         ServiciosConPaquetesPaginadosResponseDto,
         resultado,

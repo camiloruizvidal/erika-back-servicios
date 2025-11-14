@@ -91,7 +91,7 @@ export class ServicioRepository {
       include: [
         {
           model: PaqueteModel,
-          attributes: ['id', 'nombre'],
+          attributes: ['id', 'nombre', 'activo', 'fechaInicio', 'fechaFin'],
           through: { attributes: [] },
         },
       ],
@@ -117,7 +117,7 @@ export class ServicioRepository {
 
     const includeOptions: any = {
       model: PaqueteModel,
-      attributes: ['id', 'nombre'],
+      attributes: ['id', 'nombre', 'activo', 'fechaInicio', 'fechaFin'],
       through: { attributes: [] },
       required: false,
     };

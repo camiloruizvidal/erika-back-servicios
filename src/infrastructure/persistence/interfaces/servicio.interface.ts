@@ -6,5 +6,8 @@ export interface IServicio {
   paquetes?: Array<{
     id: number;
     nombre: string;
+    activo: boolean;
+    fechaInicio: Date | string;
+    fechaFin: Date | string | null;
   }>;
 }

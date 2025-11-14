@@ -11,5 +11,8 @@ export interface IServicioConPaquetesListado {
   paquetes?: Array<{
     id: number;
     nombre: string;
+    activo: boolean;
+    fechaInicio: Date | string;
+    fechaFin: Date | string | null;
   }>;
 }
