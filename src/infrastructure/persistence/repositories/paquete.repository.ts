@@ -28,6 +28,8 @@ export class PaqueteRepository {
       fechaInicio: datos.fechaInicio,
       fechaFin: datos.fechaFin ?? null,
       activo: datos.activo,
+      frecuenciaTipo: datos.frecuenciaTipo,
+      frecuenciaValor: datos.frecuenciaValor ?? null,
     });
     return Transformador.extraerDataValues(paquete);
   }

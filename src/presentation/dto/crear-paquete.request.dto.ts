@@ -3,6 +3,8 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsIn,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
@@ -14,6 +16,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { Constantes } from '../../utils/constantes';
 import { ServicioPaqueteRequestDto } from './servicio-paquete.request.dto';
 import { TransformadoresDto } from '../utils/transformadores-dto.helper';
+import { EFrecuenciaTipo } from '../../domain/enums/frecuencia-tipo.enum';
 
 export class CrearPaqueteRequestDto {
   @IsString({ message: Constantes.PROPIEDAD_NO_PERMITIDA('nombre') })
@@ -43,6 +46,20 @@ export class CrearPaqueteRequestDto {
   @IsBoolean({ message: Constantes.PROPIEDAD_NO_PERMITIDA('activo') })
   @Expose({ name: 'activo' })
   activo?: boolean;
+
+  @IsString({ message: Constantes.PROPIEDAD_NO_PERMITIDA('frecuencia_tipo') })
+  @IsIn(Object.values(EFrecuenciaTipo), {
+    message: 'El tipo de frecuencia no es válido',
+  })
+  @Expose({ name: 'frecuencia_tipo' })
+  frecuenciaTipo!: string;
+
+  @IsOptional()
+  @Transform(({ value }) => TransformadoresDto.transformarNumero(value))
+  @IsInt({ message: Constantes.PROPIEDAD_NO_PERMITIDA('frecuencia_valor') })
+  @Min(1, { message: Constantes.VALOR_MINIMO('frecuencia_valor', 1) })
+  @Expose({ name: 'frecuencia_valor' })
+  frecuenciaValor?: number | null;
 
   @IsArray({ message: Constantes.PROPIEDAD_NO_PERMITIDA('servicios') })
   @ArrayMinSize(1, { message: Constantes.SERVICIOS_REQUERIDOS })

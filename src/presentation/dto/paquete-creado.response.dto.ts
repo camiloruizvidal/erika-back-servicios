@@ -61,6 +61,24 @@ export class PaqueteCreadoResponseDto {
   activo!: boolean;
 
   @ApiProperty({
+    description: 'Tipo de frecuencia del paquete',
+    type: String,
+    example: 'mensual',
+  })
+  @Expose({ name: 'frecuenciaTipo' })
+  frecuencia_tipo!: string;
+
+  @ApiProperty({
+    description: 'Valor de la frecuencia cuando aplica (semanas o servicios)',
+    type: Number,
+    required: false,
+    nullable: true,
+    example: 4,
+  })
+  @Expose({ name: 'frecuenciaValor' })
+  frecuencia_valor!: number | null;
+
+  @ApiProperty({
     description: 'Servicios incluidos dentro del paquete',
     type: () => [ServicioAsociadoResponseDto],
   })

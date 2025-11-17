@@ -3,6 +3,7 @@ import {
   ICrearPaquete,
   IServicioPaqueteDetalle,
 } from '../../domain/interfaces/paquetes.interface';
+import { EFrecuenciaTipo } from '../../domain/enums/frecuencia-tipo.enum';
 
 export class PaquetesMapper {
   static toInterface(
@@ -16,6 +17,8 @@ export class PaquetesMapper {
       fechaInicio: dto.fechaInicio,
       fechaFin: dto.fechaFin ?? null,
       activo: dto.activo ?? true,
+      frecuenciaTipo: dto.frecuenciaTipo as EFrecuenciaTipo,
+      frecuenciaValor: dto.frecuenciaValor ?? null,
       servicios: dto.servicios.map((servicio) => this.mapearServicio(servicio)),
     };
   }

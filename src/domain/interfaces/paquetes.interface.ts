@@ -1,3 +1,5 @@
+import { EFrecuenciaTipo } from '../enums/frecuencia-tipo.enum';
+
 export interface IServicioPaqueteDetalle {
   nombre: string;
   valor: number;
@@ -10,6 +12,8 @@ export interface ICrearPaquete {
   fechaInicio: Date;
   fechaFin?: Date | null;
   activo: boolean;
+  frecuenciaTipo: EFrecuenciaTipo;
+  frecuenciaValor?: number | null;
   servicios: IServicioPaqueteDetalle[];
 }
 
@@ -26,5 +30,7 @@ export interface IPaqueteCreado {
   fechaInicio: Date;
   fechaFin: Date | null;
   activo: boolean;
+  frecuenciaTipo: EFrecuenciaTipo;
+  frecuenciaValor: number | null;
   servicios: IServicioAsociado[];
 }

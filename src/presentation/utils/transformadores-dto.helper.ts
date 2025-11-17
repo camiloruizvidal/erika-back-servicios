@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
 export class TransformadoresDto {
   public static transformarNumero(
@@ -35,7 +35,7 @@ export class TransformadoresDto {
       return undefined;
     }
 
-    const fecha = moment.utc(valor).startOf('day');
+    const fecha = moment.tz(valor, 'America/Bogota').startOf('day').utc();
     if (!fecha.isValid()) {
       return undefined;
     }

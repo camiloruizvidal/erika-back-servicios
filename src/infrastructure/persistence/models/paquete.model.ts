@@ -9,6 +9,7 @@ import {
 } from 'sequelize-typescript';
 import { ServicioModel } from './servicio.model';
 import { PaqueteServicioModel } from './paquete-servicio.model';
+import { EFrecuenciaTipo } from '../../../domain/enums/frecuencia-tipo.enum';
 
 @Table({
   tableName: 'paquetes',
@@ -49,6 +50,15 @@ export class PaqueteModel extends Model {
   @Default(true)
   @Column({ type: DataType.BOOLEAN })
   activo!: boolean;
+
+  @AllowNull(false)
+  @Default(EFrecuenciaTipo.MENSUAL)
+  @Column({ type: DataType.STRING(20), field: 'frecuencia_tipo' })
+  frecuenciaTipo!: EFrecuenciaTipo;
+
+  @AllowNull(true)
+  @Column({ type: DataType.INTEGER, field: 'frecuencia_valor' })
+  frecuenciaValor!: number | null;
 
   @BelongsToMany(() => ServicioModel, () => PaqueteServicioModel)
   servicios?: ServicioModel[];
