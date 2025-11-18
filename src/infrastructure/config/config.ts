@@ -8,7 +8,7 @@ export class Config {
     return process.env.AMBIENTE;
   }
 
-  static readonly puerto = Number(process.env.PORT ?? 3000);
+  static readonly puerto = Number(process.env.PORT);
   static readonly dbHost = process.env.DB_HOST;
   static readonly dbPuerto = Number(process.env.DB_PORT);
   static readonly dbUsuario = process.env.DB_USER;
@@ -17,4 +17,18 @@ export class Config {
   static readonly dbDialect = process.env.DB_DIALECT as Dialect;
   static readonly dbLogging = process.env.DB_LOGGING === 'true';
   static readonly jwtKey = process.env.JWT_KEY;
+}
+
+const errors: string[] = [];
+Object.keys(Config).forEach((key) => {
+  if (
+    Config[key] === null ||
+    Config[key] === undefined ||
+    `${Config[key]}`.trim() === ''
+  ) {
+    errors.push(`La variable de entorno ${key} es requerida`);
+  }
+});
+if (errors.length > 0) {
+  throw new Error(errors.join('\n'));
 }
