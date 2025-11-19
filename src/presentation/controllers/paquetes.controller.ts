@@ -38,6 +38,8 @@ interface RequestConTenant extends Request {
 @ApiTags('packages')
 @Controller('api/v1/packages')
 export class PaquetesController {
+  private readonly logger = new Logger(PaquetesController.name);
+
   constructor(
     private readonly paquetesService: PaquetesService,
     private readonly manejadorError: ManejadorError,
@@ -74,7 +76,7 @@ export class PaquetesController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -98,7 +100,7 @@ export class PaquetesController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -121,7 +123,7 @@ export class PaquetesController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -148,7 +150,7 @@ export class PaquetesController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }

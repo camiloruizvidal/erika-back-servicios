@@ -41,6 +41,8 @@ interface RequestConTenant extends Request {
 @ApiTags('services')
 @Controller('api/v1/services')
 export class ServiciosController {
+  private readonly logger = new Logger(ServiciosController.name);
+
   constructor(
     private readonly serviciosService: ServiciosService,
     private readonly manejadorError: ManejadorError,
@@ -75,7 +77,7 @@ export class ServiciosController {
         },
       );
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -109,7 +111,7 @@ export class ServiciosController {
         },
       );
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -133,7 +135,7 @@ export class ServiciosController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
@@ -155,7 +157,7 @@ export class ServiciosController {
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      Logger.error({ error: JSON.stringify(error) });
+      this.logger.error({ error: JSON.stringify(error) });
       this.manejadorError.resolverErrorApi(error);
     }
   }
