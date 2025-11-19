@@ -29,36 +29,36 @@ export class PaqueteModel extends Model {
 
   @AllowNull(false)
   @Column({ type: DataType.BIGINT, field: 'tenant_id' })
-  tenantId!: number;
+  declare tenantId: number;
 
   @AllowNull(false)
   @Column({ type: DataType.STRING(150) })
-  nombre!: string;
+  declare nombre: string;
 
   @AllowNull(false)
   @Column({ type: DataType.DECIMAL(12, 2) })
-  valor!: number;
+  declare valor: number;
 
   @AllowNull(false)
   @Column({ type: DataType.DATE, field: 'fecha_inicio' })
-  fechaInicio!: Date;
+  declare fechaInicio: Date;
 
   @AllowNull(true)
   @Column({ type: DataType.DATE, field: 'fecha_fin' })
-  fechaFin!: Date | null;
+  declare fechaFin: Date | null;
 
   @Default(true)
   @Column({ type: DataType.BOOLEAN })
-  activo!: boolean;
+  declare activo: boolean;
 
   @AllowNull(false)
   @Default(EFrecuenciaTipo.MENSUAL)
   @Column({ type: DataType.STRING(20), field: 'frecuencia_tipo' })
-  frecuenciaTipo!: EFrecuenciaTipo;
+  declare frecuenciaTipo: EFrecuenciaTipo;
 
   @AllowNull(true)
   @Column({ type: DataType.INTEGER, field: 'frecuencia_valor' })
-  frecuenciaValor!: number | null;
+  declare frecuenciaValor: number | null;
 
   @BelongsToMany(() => ServicioModel, () => PaqueteServicioModel)
   servicios?: ServicioModel[];

@@ -29,7 +29,7 @@ export class PaqueteServicioModel extends Model {
   @ForeignKey(() => PaqueteModel)
   @AllowNull(false)
   @Column({ type: DataType.BIGINT, field: 'paquete_id' })
-  paqueteId!: number;
+  declare paqueteId: number;
 
   @BelongsTo(() => PaqueteModel)
   paquete?: PaqueteModel;
@@ -37,12 +37,12 @@ export class PaqueteServicioModel extends Model {
   @ForeignKey(() => ServicioModel)
   @AllowNull(false)
   @Column({ type: DataType.BIGINT, field: 'servicio_id' })
-  servicioId!: number;
+  declare servicioId: number;
 
   @BelongsTo(() => ServicioModel)
   servicio?: ServicioModel;
 
   @AllowNull(false)
   @Column({ type: DataType.BIGINT, field: 'tenant_id' })
-  tenantId!: number;
+  declare tenantId: number;
 }
